@@ -1,5 +1,5 @@
 # hbactl - version and build
-VERSION ?= v0.1.1
+VERSION ?= v0.1.3
 
 BINARY   = hbactl
 MAIN     = .

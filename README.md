@@ -1,6 +1,6 @@
 # hbactl
 
-[![version](https://img.shields.io/badge/version-v0.1.1-blue)](https://github.com/hrodrig/hbactl/releases) [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![version](https://img.shields.io/badge/version-v0.1.3-blue)](https://github.com/hrodrig/hbactl/releases) [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 `hbactl` is a lightweight CLI tool written in **Go** designed to manage your PostgreSQL Host-Based Authentication (`pg_hba.conf`) file safely and efficiently.
 
@@ -11,6 +11,7 @@
 - **Reload**: Apply changes with `hbactl reload` (`pg_reload_conf()`), no restart.
 - **Single Binary**: One executable; no runtime dependencies.
 - **Formats**: Supports both CIDR (e.g. `192.168.1.0/24`) and legacy IP+netmask in `list` and `add`.
+- **Group by user**: List with `--group-by user` for visual separators; add with `--after-user <name>` to insert after that user’s last rule and keep rules grouped.
 
 ## Installation
 
@@ -40,25 +41,29 @@ Global flags (optional):
 
 ### List current rules
 
-Displays a formatted table of your rules. Supports **`--sort`** by column: `type`, `database`, `user`, `address`, `method` (display only; file order is unchanged).
+Displays a formatted table of your rules. Supports **`--sort`** by column: `type`, `database`, `user`, `address`, `method` (display only; file order is unchanged). Use **`--group-by user`** to print `=== user: name ===` separators between users (implies sort by user if `--sort` is not set).
 
 ```bash
 hbactl list
 hbactl list -f /path/to/pg_hba.conf              # no connection needed
-hbactl list --sort type
+hbactl list --sort user
+hbactl list --group-by user                      # separators between users
 ```
 
 ### Add a new rule
 
-Creates a **backup** (`.bak` or `.bak.<timestamp>`) then appends the rule. Requires connection or `--file`.
+Creates a **backup** (`.bak` or `.bak.<timestamp>`) then appends the rule, or **inserts** it after the last rule for a given user if **`--after-user`** is set (keeps rules grouped by user). Use **`--dry-run`** to preview the line (shows “would append” or “would insert after last rule for user …” when using `--after-user`); no file write or backup. Requires connection or `--file` when not using `--dry-run`.
 
 ```bash
 hbactl add --type host --db all --user app --addr 192.168.1.100/32 --method scram-sha-256
 hbactl add --type host --db all --user all --addr 10.0.0.0/24 --netmask 255.255.255.0 --method md5   # legacy format
 hbactl add -f /path/to/pg_hba.conf --type host --db all --user all --addr 127.0.0.1/32 --method trust
+hbactl add --dry-run --type host --db all --user pepe --addr 10.0.0.1/32 --method ident --ident-map my_ident_map   # preview only
+hbactl add --type host --db all --user pepe --addr 10.0.0.1/32 --method ident --ident-map my_ident_map   # ident with user map
+hbactl add --type host --db all --user pepe --addr 10.0.0.5/32 --method md5 --after-user pepe   # insert after last "pepe" rule
 ```
 
-Flags: **`--type`** (required: `local`, `host`, `hostssl`, …), **`--db`**, **`--user`**, **`--addr`** (required for host types), **`--netmask`** (optional, legacy), **`--method`** (required).
+Flags: **`--type`** (required), **`--db`**, **`--user`**, **`--addr`** (required for host types), **`--netmask`** (optional, legacy), **`--method`** (required), **`--ident-map`** (optional: for `ident` method), **`--after-user`** (insert after last rule for this user; default appends at end), **`--dry-run`** (print line without writing).
 
 ### Check for errors
 

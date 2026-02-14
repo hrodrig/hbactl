@@ -7,6 +7,56 @@ import (
 	"time"
 )
 
+// InsertRuleAfterUser inserts the rule after the last rule whose User equals afterUser.
+// If afterUser is empty or no such rule exists, the rule is appended at the end.
+// Call Backup before this if you want a backup.
+func InsertRuleAfterUser(path string, r Rule, afterUser string) error {
+	line := r.Line()
+	if line == "" {
+		return fmt.Errorf("invalid rule type %q", r.Type)
+	}
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return err
+	}
+	content := string(data)
+	lines := strings.Split(content, "\n")
+	// If file ends with newline, lines has a trailing ""; we'll preserve that when inserting.
+	lastIdx := -1
+	for i := range lines {
+		ln := strings.TrimSpace(lines[i])
+		if j := strings.Index(ln, "#"); j >= 0 {
+			ln = strings.TrimSpace(ln[:j])
+		}
+		if ln == "" {
+			continue
+		}
+		parsed, ok := parseLine(ln)
+		if !ok {
+			continue
+		}
+		if parsed.User == afterUser {
+			lastIdx = i
+		}
+	}
+	var newLines []string
+	if lastIdx < 0 {
+		// Append: drop trailing empty from split so we don't add an extra blank line
+		trimmed := lines
+		if len(lines) > 0 && lines[len(lines)-1] == "" {
+			trimmed = lines[:len(lines)-1]
+		}
+		newLines = append(trimmed, line)
+	} else {
+		newLines = append(lines[:lastIdx+1], append([]string{line}, lines[lastIdx+1:]...)...)
+	}
+	out := strings.Join(newLines, "\n")
+	if !strings.HasSuffix(out, "\n") {
+		out += "\n"
+	}
+	return os.WriteFile(path, []byte(out), 0644)
+}
+
 // Backup copies path to path.bak (or path.bak.<timestamp> if path.bak exists). Returns the backup path.
 func Backup(path string) (string, error) {
 	data, err := os.ReadFile(path)
