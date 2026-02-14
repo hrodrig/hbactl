@@ -1,8 +1,12 @@
 # hbactl
 
-[![version](https://img.shields.io/badge/version-v0.1.3-blue)](https://github.com/hrodrig/hbactl/releases) [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![version](https://img.shields.io/badge/version-v0.1.4-blue)](https://github.com/hrodrig/hbactl/releases) [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 `hbactl` is a lightweight CLI tool written in **Go** designed to manage your PostgreSQL Host-Based Authentication (`pg_hba.conf`) file safely and efficiently.
+
+![hbactl demo](docs/demo.gif)
+
+See the [sequence diagrams](docs/README.md) for command flows (general, list, add, check, reload).
 
 ## Features
 

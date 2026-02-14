@@ -18,3 +18,8 @@
 !.cursor/
 !.cursor/rules/
 !.cursor/rules/*.mdc
+!docs/
+!docs/*.md
+!docs/*.gif
+!docs/*.tape
+!sample-pg_hba.conf
