@@ -30,6 +30,20 @@ archives:
 checksum:
   name_template: "checksums.txt"
 
+nfpms:
+  - id: default
+    package_name: hbactl
+    file_name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    description: CLI to manage PostgreSQL pg_hba.conf safely
+    vendor: "Hermes Rodríguez"
+    homepage: https://github.com/hrodrig/hbactl
+    license: MIT
+    formats:
+      - deb
+      - rpm
+    builds:
+      - hbactl
+
 snapshot:
   version_template: "{{ incpatch .Version }}-next"
 
