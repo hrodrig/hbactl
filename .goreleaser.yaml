@@ -17,7 +17,7 @@ builds:
       - CGO_ENABLED=0
     ldflags:
       - -s -w
-      - -X github.com/hrodrig/hbactl/cmd.Version={{ .Version }}
+      - -X github.com/hrodrig/hbactl/cmd.Version=v{{ .Version }}
 
 archives:
   - id: default
@@ -25,7 +25,7 @@ archives:
     format_overrides:
       - goos: windows
         format: zip
-    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    name_template: "{{ .ProjectName }}_{{ .Tag }}_{{ .Os }}_{{ .Arch }}"
 
 checksum:
   name_template: "checksums.txt"
@@ -33,7 +33,7 @@ checksum:
 nfpms:
   - id: default
     package_name: hbactl
-    file_name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    file_name_template: "{{ .ProjectName }}_{{ .Tag }}_{{ .Os }}_{{ .Arch }}"
     description: CLI to manage PostgreSQL pg_hba.conf safely
     vendor: "Hermes Rodríguez"
     homepage: https://github.com/hrodrig/hbactl

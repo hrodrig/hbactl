@@ -8,6 +8,6 @@ alwaysApply: false
 
 The main **README.md** must keep badges **in sync with the version in the Makefile** (`VERSION ?= x.y.z` at the top).
 
-- When you **bump `VERSION`** in the Makefile, update any version badge or version text in the README to the same value (e.g. `v0.1.0` or `0.1.0`).
+- Use the **`v` prefix** consistently: `VERSION ?= v0.1.0`, badge `version-v0.1.0`, tag `v0.1.0`. When you bump, update Makefile and README to the same value (e.g. `v0.1.1`).
 - Prefer a single source of truth: the Makefile defines the version; README badges and any "current version" text must reflect it.
 - If using a dynamic badge (e.g. GitHub release/tag), ensure released tags match the Makefile version so the badge stays correct.
