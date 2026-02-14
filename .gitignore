@@ -1,0 +1,20 @@
+# Exclude everything, then allow only what goes to the repo
+*
+**/*
+
+!.gitignore
+!.goreleaser.yaml
+!Makefile
+!README.md
+!LICENSE
+!go.mod
+!go.sum
+!*.go
+!**/*.go
+# allow dirs so !**/*.go matches inside them (Git must descend into dirs)
+!cmd/
+!internal/
+!internal/**/
+!.cursor/
+!.cursor/rules/
+!.cursor/rules/*.mdc

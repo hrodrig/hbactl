@@ -1,0 +1,14 @@
+---
+description: Code in this repo must be in English
+alwaysApply: true
+---
+
+# Language: code in English
+
+All **code** in this repository must be in **English**:
+
+- **Identifiers**: package, variable, function, type, and file names
+- **Comments**: line and block comments in source files
+- **Strings in code**: error messages, log text, CLI output, user-facing strings
+
+Documentation (README, PLAN) and commit messages are recommended in English for a public repo but not enforced by this rule. Local notes (e.g. NOTES.txt) may stay in any language.

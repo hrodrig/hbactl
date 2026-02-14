@@ -1,0 +1,13 @@
+---
+description: README badges must match version in Makefile
+globs: README.md
+alwaysApply: false
+---
+
+# README badges and version
+
+The main **README.md** must keep badges **in sync with the version in the Makefile** (`VERSION ?= x.y.z` at the top).
+
+- When you **bump `VERSION`** in the Makefile, update any version badge or version text in the README to the same value (e.g. `v0.1.0` or `0.1.0`).
+- Prefer a single source of truth: the Makefile defines the version; README badges and any "current version" text must reflect it.
+- If using a dynamic badge (e.g. GitHub release/tag), ensure released tags match the Makefile version so the badge stays correct.
