@@ -33,4 +33,4 @@ sequenceDiagram
     end
 ```
 
-[General](sequence-general.md) · [List](sequence-list.md) · [Check](sequence-check.md) · [Reload](sequence-reload.md)
+[General](sequence-general.md) · [List](sequence-list.md) · [Remove](sequence-remove.md) · [Check](sequence-check.md) · [Reload](sequence-reload.md)

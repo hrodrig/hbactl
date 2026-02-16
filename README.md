@@ -1,12 +1,12 @@
 # hbactl
 
-[![version](https://img.shields.io/badge/version-v0.1.4-blue)](https://github.com/hrodrig/hbactl/releases) [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![version](https://img.shields.io/badge/version-v0.1.8-blue)](https://github.com/hrodrig/hbactl/releases) [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 `hbactl` is a lightweight CLI tool written in **Go** designed to manage your PostgreSQL Host-Based Authentication (`pg_hba.conf`) file safely and efficiently.
 
 ![hbactl demo](docs/demo.gif)
 
-See the [sequence diagrams](docs/README.md) for command flows (general, list, add, check, reload).
+See the [sequence diagrams](docs/README.md) for command flows (general, list, add, remove, check, reload).
 
 ## Features
 
@@ -41,11 +41,11 @@ go build -o hbactl .
 Global flags (optional):
 
 - **`-c` / `--conn`** — PostgreSQL connection string (default: `DATABASE_URL`).
-- **`-f` / `--file`** — Path to `pg_hba.conf` (for `list` and `add`; can avoid connection for `list`).
+- **`-f` / `--file`** — Path to `pg_hba.conf` (for `list`, `add`, and `remove`; can avoid connection for `list`).
 
 ### List current rules
 
-Displays a formatted table of your rules. Supports **`--sort`** by column: `type`, `database`, `user`, `address`, `method` (display only; file order is unchanged). Use **`--group-by user`** to print `=== user: name ===` separators between users (implies sort by user if `--sort` is not set).
+Displays a formatted table of your rules with a **#** column (1-based index in file order; use with `remove --index`). Supports **`--sort`** by column: `type`, `database`, `user`, `address`, `method` (display only; file order is unchanged). Use **`--group-by user`** to print `=== user: name ===` separators between users (implies sort by user if `--sort` is not set).
 
 ```bash
 hbactl list
@@ -68,6 +68,29 @@ hbactl add --type host --db all --user pepe --addr 10.0.0.5/32 --method md5 --af
 ```
 
 Flags: **`--type`** (required), **`--db`**, **`--user`**, **`--addr`** (required for host types), **`--netmask`** (optional, legacy), **`--method`** (required), **`--ident-map`** (optional: for `ident` method), **`--after-user`** (insert after last rule for this user; default appends at end), **`--dry-run`** (print line without writing).
+
+### Remove rule(s)
+
+Creates a **backup** then removes one rule by **`--index`** or all matching rules by criteria. Use **`--dry-run`** to preview. Requires connection or **`--file`**.
+
+**By index** (1-based, same as the **#** column in `hbactl list`):
+
+```bash
+hbactl list                                    # show rules with # column
+hbactl remove --index 3                        # remove the 3rd rule (in file order)
+hbactl remove -f /path/to/pg_hba.conf --index 1
+hbactl remove --index 2 --dry-run               # preview only
+```
+
+**By criteria** (removes all matching rules in one run):
+
+```bash
+hbactl remove -f sample-pg_hba.conf --user app_user --dry-run              # all rules for user app_user (any database)
+hbactl remove -f sample-pg_hba.conf --user app_user --db app_planning --dry-run   # only app_user on database app_planning
+hbactl remove -f sample-pg_hba.conf --addr 10.0.1.7 --dry-run             # all rules from IP 10.0.1.7
+```
+
+Flags: **`--index`** (1-based rule number; use alone), **`--user`** (remove all rules for this user), **`--db`** (with **`--user`**, limit to this database), **`--addr`** (remove all rules matching this address, e.g. `10.0.1.7` or `10.0.1.7/32`), **`--dry-run`** (print rule(s) that would be removed without writing or backup). Use either **`--index`** or one of **`--user`** / **`--addr`** per run, not both.
 
 ### Check for errors
 

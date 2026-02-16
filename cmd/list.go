@@ -47,7 +47,7 @@ func runList(cmd *cobra.Command, _ []string) error {
 		path = p
 	}
 
-	rules, err := hba.ParseFile(path)
+	rwl, err := hba.ParseFileWithLineNumbers(path)
 	if err != nil {
 		return fmt.Errorf("could not read file (try running with sudo?): %w", err)
 	}
@@ -65,14 +65,14 @@ func runList(cmd *cobra.Command, _ []string) error {
 		if !hba.ValidSortColumn(sortCol) {
 			return fmt.Errorf("invalid --sort %q; use one of: type, database, user, address, method", sortCol)
 		}
-		hba.SortRules(rules, sortCol)
+		hba.SortRulesWithLine(rwl, sortCol)
 	}
 
-	fmt.Printf("File: %s (%d rule(s))\n\n", path, len(rules))
+	fmt.Printf("File: %s (%d rule(s))\n\n", path, len(rwl))
 	if listGroupBy == "user" {
-		cli.WriteRulesTableGroupedByUser(os.Stdout, rules)
+		cli.WriteRulesTableGroupedByUser(os.Stdout, rwl)
 	} else {
-		cli.WriteRulesTable(os.Stdout, rules)
+		cli.WriteRulesTableWithIndex(os.Stdout, rwl)
 	}
 	return nil
 }

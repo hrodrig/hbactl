@@ -26,19 +26,40 @@ func LocalType(typ string) bool { return localTypes[typ] }
 // HostType returns true if typ is a host connection type (has address).
 func HostType(typ string) bool { return hostTypes[typ] }
 
+// RuleWithLine holds a rule, its 1-based file line number, and its 1-based rule index (order in file).
+type RuleWithLine struct {
+	Rule   Rule
+	LineNo int // line number in file
+	Index  int // 1-based rule number in file (for remove --index)
+}
+
 // ParseFile reads path and returns parsed rules. Comment and empty lines are skipped.
 func ParseFile(path string) ([]Rule, error) {
+	rwl, err := ParseFileWithLineNumbers(path)
+	if err != nil {
+		return nil, err
+	}
+	rules := make([]Rule, len(rwl))
+	for i := range rwl {
+		rules[i] = rwl[i].Rule
+	}
+	return rules, nil
+}
+
+// ParseFileWithLineNumbers reads path and returns parsed rules with their 1-based file line numbers.
+func ParseFileWithLineNumbers(path string) ([]RuleWithLine, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
 	defer f.Close()
 
-	var rules []Rule
+	var result []RuleWithLine
 	scanner := bufio.NewScanner(f)
+	lineNo := 0
 	for scanner.Scan() {
+		lineNo++
 		line := strings.TrimSpace(scanner.Text())
-		// Strip inline comment
 		if i := strings.Index(line, "#"); i >= 0 {
 			line = strings.TrimSpace(line[:i])
 		}
@@ -47,11 +68,11 @@ func ParseFile(path string) ([]Rule, error) {
 		}
 		rule, ok := parseLine(line)
 		if !ok {
-			continue // skip malformed or non-rule lines
+			continue
 		}
-		rules = append(rules, rule)
+		result = append(result, RuleWithLine{Rule: rule, LineNo: lineNo, Index: len(result) + 1})
 	}
-	return rules, scanner.Err()
+	return result, scanner.Err()
 }
 
 // parseLine parses one line into a Rule. Returns ok=false if the line is not a valid rule.

@@ -22,6 +22,22 @@ func SortRules(rules []Rule, by string) {
 	}
 }
 
+// SortRulesWithLine sorts RuleWithLine slice by the Rule field (same columns as SortRules).
+func SortRulesWithLine(rwl []RuleWithLine, by string) {
+	switch by {
+	case "type":
+		sort.Slice(rwl, func(i, j int) bool { return rwl[i].Rule.Type < rwl[j].Rule.Type })
+	case "database":
+		sort.Slice(rwl, func(i, j int) bool { return rwl[i].Rule.Database < rwl[j].Rule.Database })
+	case "user":
+		sort.Slice(rwl, func(i, j int) bool { return rwl[i].Rule.User < rwl[j].Rule.User })
+	case "address":
+		sort.Slice(rwl, func(i, j int) bool { return rwl[i].Rule.Address < rwl[j].Rule.Address })
+	case "method":
+		sort.Slice(rwl, func(i, j int) bool { return rwl[i].Rule.Method < rwl[j].Rule.Method })
+	}
+}
+
 // ValidSortColumn returns true if col is one of the sortable columns.
 func ValidSortColumn(col string) bool {
 	for _, c := range SortColumns {

@@ -30,4 +30,4 @@ sequenceDiagram
     hbactl->>User: File: path (N rules) + table
 ```
 
-[General](sequence-general.md) · [Add](sequence-add.md) · [Check](sequence-check.md) · [Reload](sequence-reload.md)
+[General](sequence-general.md) · [Add](sequence-add.md) · [Remove](sequence-remove.md) · [Check](sequence-check.md) · [Reload](sequence-reload.md)

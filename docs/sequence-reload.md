@@ -16,4 +16,4 @@ sequenceDiagram
     hbactl->>User: Success: configuration reloaded.
 ```
 
-[General](sequence-general.md) · [List](sequence-list.md) · [Add](sequence-add.md) · [Check](sequence-check.md)
+[General](sequence-general.md) · [List](sequence-list.md) · [Add](sequence-add.md) · [Remove](sequence-remove.md) · [Check](sequence-check.md)
