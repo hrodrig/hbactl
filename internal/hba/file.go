@@ -84,6 +84,54 @@ func (r Rule) Line() string {
 	return ""
 }
 
+// RemoveLine removes the line at 1-based lineNo from the file. Other lines (comments, blanks, other rules) are unchanged.
+// Call Backup before this if you want a backup.
+func RemoveLine(path string, lineNo int) error {
+	if lineNo < 1 {
+		return fmt.Errorf("line number %d out of range (must be >= 1)", lineNo)
+	}
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return err
+	}
+	lines := strings.Split(string(data), "\n")
+	if lineNo > len(lines) {
+		return fmt.Errorf("line number %d out of range (file has %d lines)", lineNo, len(lines))
+	}
+	return RemoveLines(path, []int{lineNo})
+}
+
+// RemoveLines removes the lines at 1-based line numbers. Other lines are unchanged.
+// Call Backup before this if you want a backup.
+func RemoveLines(path string, lineNumbers []int) error {
+	if len(lineNumbers) == 0 {
+		return nil
+	}
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return err
+	}
+	lines := strings.Split(string(data), "\n")
+	toRemove := make(map[int]bool)
+	for _, n := range lineNumbers {
+		idx := n - 1
+		if idx >= 0 && idx < len(lines) {
+			toRemove[idx] = true
+		}
+	}
+	var newLines []string
+	for i, ln := range lines {
+		if !toRemove[i] {
+			newLines = append(newLines, ln)
+		}
+	}
+	out := strings.Join(newLines, "\n")
+	if !strings.HasSuffix(out, "\n") {
+		out += "\n"
+	}
+	return os.WriteFile(path, []byte(out), 0644)
+}
+
 // AppendRule appends the rule line to the file, prefixed with newline if file is not empty.
 func AppendRule(path string, r Rule) error {
 	line := r.Line()

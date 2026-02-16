@@ -1,4 +1,4 @@
-# hbactl demo — list and add (dry-run)
+# hbactl demo — list, add, remove (dry-run)
 # Run from repo root: go build -o hbactl . && vhs docs/demo.tape
 
 Output docs/demo.gif
@@ -45,6 +45,20 @@ Sleep 1s
 
 # Dry-run: insert after user
 Type "./hbactl add --dry-run -f sample-pg_hba.conf --type host --db app_ops --user ops_user --addr 10.0.0.5/32 --method md5 --after-user ops_user"
+Enter
+Sleep 2s
+Enter
+Sleep 1s
+
+# Dry-run: remove by user (all databases)
+Type "./hbactl remove -f sample-pg_hba.conf --user app_user --dry-run"
+Enter
+Sleep 2s
+Enter
+Sleep 1s
+
+# Dry-run: remove by user and database
+Type "./hbactl remove -f sample-pg_hba.conf --user app_user --db app_planning --dry-run"
 Enter
 Sleep 2s
 Enter

@@ -20,4 +20,4 @@ sequenceDiagram
     end
 ```
 
-[General](sequence-general.md) · [List](sequence-list.md) · [Add](sequence-add.md) · [Reload](sequence-reload.md)
+[General](sequence-general.md) · [List](sequence-list.md) · [Add](sequence-add.md) · [Remove](sequence-remove.md) · [Reload](sequence-reload.md)
