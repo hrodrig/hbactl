@@ -1,6 +1,6 @@
 # hbactl
 
-[![version](https://img.shields.io/badge/version-v0.1.8-blue)](https://github.com/hrodrig/hbactl/releases) [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![version](https://img.shields.io/badge/version-v0.1.9-blue)](https://github.com/hrodrig/hbactl/releases) [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 `hbactl` is a lightweight CLI tool written in **Go** designed to manage your PostgreSQL Host-Based Authentication (`pg_hba.conf`) file safely and efficiently.
 
@@ -19,7 +19,14 @@ See the [sequence diagrams](docs/README.md) for command flows (general, list, ad
 
 ## Installation
 
-**From Go (recommended):**
+**Homebrew (macOS, Linux):**
+
+```bash
+brew tap hrodrig/hbactl
+brew install hbactl
+```
+
+**From Go:**
 
 ```bash
 go install github.com/hrodrig/hbactl@latest
@@ -190,6 +197,8 @@ git push origin v0.1.0
 ```
 
 `make release` will fail if you are not on `main`. Use `make snapshot` on any branch to test builds locally.
+
+**Homebrew tap (one-time setup):** So that `brew install hrodrig/hbactl/hbactl` works, create an empty repo `github.com/hrodrig/homebrew-hbactl`. GoReleaser will push the cask there on each release. If you run `make release` from your machine (not CI), ensure `.goreleaser.yaml` has the tap repo and run release; you may need to uncomment `token` and set `HOMEBREW_TAP_TOKEN` (GitHub PAT with `repo` scope) if pushing to the tap from CI.
 
 ## License
 
