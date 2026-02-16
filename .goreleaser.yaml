@@ -54,3 +54,26 @@ changelog:
       - "^docs:"
       - "^chore:"
       - "^test:"
+
+# Homebrew: publish cask to tap so users can "brew install hrodrig/hbactl/hbactl"
+# Create repo https://github.com/hrodrig/homebrew-hbactl first. For CI, set HOMEBREW_TAP_TOKEN (PAT with repo scope).
+homebrew_casks:
+  - name: hbactl
+    directory: Casks
+    homepage: "https://github.com/hrodrig/hbactl"
+    description: "CLI to manage PostgreSQL pg_hba.conf safely"
+    repository:
+      owner: hrodrig
+      name: homebrew-hbactl
+      branch: main
+    # Uncomment and set token if publishing from CI (e.g. GitHub Actions):
+    # token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+    url:
+      verified: "github.com/hrodrig/hbactl/"
+    # Remove quarantine so unsigned binary runs on macOS (optional; user can run xattr manually)
+    hooks:
+      post:
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/hbactl"]
+          end
