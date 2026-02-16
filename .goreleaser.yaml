@@ -66,8 +66,8 @@ homebrew_casks:
       owner: hrodrig
       name: homebrew-hbactl
       branch: main
-    # Uncomment and set token if publishing from CI (e.g. GitHub Actions):
-    # token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+      # PAT with repo scope; required to push to the tap (local: export HOMEBREW_TAP_TOKEN=ghp_xxx)
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
     url:
       verified: "github.com/hrodrig/hbactl/"
     # Remove quarantine so unsigned binary runs on macOS (optional; user can run xattr manually)
