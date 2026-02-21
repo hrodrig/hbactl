@@ -1,9 +1,9 @@
 # hbactl - version and build
-VERSION ?= v0.1.9
-
-BINARY   = hbactl
-MAIN     = .
-LDFLAGS  = -s -w -X github.com/hrodrig/hbactl/cmd.Version=$(VERSION)
+# Version from VERSION file (single source of truth); override: make build VERSION=v0.2.0
+VERSION   ?= $(shell v=$$(cat VERSION 2>/dev/null | tr -d '\n\r'); [ -n "$$v" ] && echo "v$$v" || echo "v0.1.0")
+BINARY    = hbactl
+MAIN      = .
+LDFLAGS   = -s -w -X github.com/hrodrig/hbactl/cmd.Version=$(VERSION)
 
 .PHONY: build test clean install release
 

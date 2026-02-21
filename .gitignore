@@ -5,8 +5,11 @@
 !.gitignore
 !.goreleaser.yaml
 !Makefile
+!VERSION
 !README.md
 !LICENSE
+!SECURITY.md
+!AGENTS.md
 !go.mod
 !go.sum
 !*.go
@@ -15,6 +18,7 @@
 !cmd/
 !internal/
 !internal/**/
+!.agents/
 !.cursor/
 !.cursor/rules/
 !.cursor/rules/*.mdc

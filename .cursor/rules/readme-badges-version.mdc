@@ -1,13 +1,12 @@
 ---
-description: README badges must match version in Makefile
+description: README badges must match VERSION file
 globs: README.md
 alwaysApply: false
 ---
 
 # README badges and version
 
-The main **README.md** must keep badges **in sync with the version in the Makefile** (`VERSION ?= x.y.z` at the top).
+The **VERSION** file at the repo root is the single source of truth for the version (e.g. `0.1.9` without the `v` prefix). The Makefile reads it and uses `v` for builds and ldflags.
 
-- Use the **`v` prefix** consistently: `VERSION ?= v0.1.0`, badge `version-v0.1.0`, tag `v0.1.0`. When you bump, update Makefile and README to the same value (e.g. `v0.1.1`).
-- Prefer a single source of truth: the Makefile defines the version; README badges and any "current version" text must reflect it.
-- If using a dynamic badge (e.g. GitHub release/tag), ensure released tags match the Makefile version so the badge stays correct.
+- **README.md** badge must match: badge value is `version-vX.Y.Z` where `X.Y.Z` is the content of **VERSION** (e.g. VERSION contains `0.1.9` → badge `version-v0.1.9`). When you bump, update **VERSION** first, then the README badge to the same value.
+- Git tags use the `v` prefix: `v0.1.9`. Released tags must match the VERSION file so the badge stays correct.
