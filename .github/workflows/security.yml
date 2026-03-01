@@ -72,5 +72,5 @@ jobs:
           curl -sSfL https://get.anchore.io/grype | sh -s -- -b /usr/local/bin
 
       - name: Run Grype on image
-        run: grype hbactl:scan --fail-on high,critical
+        run: grype hbactl:scan --fail-on high
         continue-on-error: true

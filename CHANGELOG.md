@@ -12,6 +12,21 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.2.2] - 2026-03-01
+
+### Added
+
+- **Makefile:** `make check` (go mod verify, build, test, lint, scan.sh) for pre-merge/release; `make docker-scan` (build hbactl:scan + Grype --fail-on high). Documented in tools/README.md, AGENTS.md, release-tests.mdc, git-flow.mdc.
+- **Docker:** Dockerfile.release for GoReleaser dockers_v2 (multi-arch image to ghcr.io/hrodrig/hbactl); layout linux/<arch>/hbactl for snapshot/release. .gitignore Dockerfile.release.
+
+### Changed
+
+- **Go:** go.mod and README badge to Go 1.26; indirect deps aligned with pgwd (golang.org/x/sync v0.19.0, x/text v0.34.0).
+- **Grype:** `--fail-on high` (single severity; high and critical). Makefile, CI, tools/README updated (was invalid `high,critical`).
+- **README:** Published image ghcr.io/hrodrig/hbactl, docker run examples; Go 1.26 badge.
+
+---
+
 ## [0.2.0] - 2026-02-28
 
 ### Added
@@ -93,7 +108,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
-[Unreleased]: https://github.com/hrodrig/hbactl/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/hrodrig/hbactl/compare/v0.2.2...HEAD
+[0.2.2]: https://github.com/hrodrig/hbactl/compare/v0.2.0...v0.2.2
 [0.2.0]: https://github.com/hrodrig/hbactl/compare/v0.1.10...v0.2.0
 [0.1.10]: https://github.com/hrodrig/hbactl/compare/v0.1.9...v0.1.10
 [0.1.9]: https://github.com/hrodrig/hbactl/compare/v0.1.8...v0.1.9

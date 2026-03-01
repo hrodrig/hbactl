@@ -1,8 +1,8 @@
 # hbactl
 
-[![Version](https://img.shields.io/badge/version-0.2.0-blue)](https://github.com/hrodrig/hbactl/releases)
+[![Version](https://img.shields.io/badge/version-0.2.2-blue)](https://github.com/hrodrig/hbactl/releases)
 [![Release](https://img.shields.io/github/v/release/hrodrig/hbactl)](https://github.com/hrodrig/hbactl/releases)
-[![Go 1.25](https://img.shields.io/badge/go-1.25-00ADD8?logo=go)](https://go.dev/)
+[![Go 1.26](https://img.shields.io/badge/go-1.26-00ADD8?logo=go)](https://go.dev/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![pkg.go.dev](https://pkg.go.dev/badge/github.com/hrodrig/hbactl)](https://pkg.go.dev/github.com/hrodrig/hbactl)
 [![Go Report Card](https://goreportcard.com/badge/github.com/hrodrig/hbactl)](https://goreportcard.com/report/github.com/hrodrig/hbactl)

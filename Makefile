@@ -5,13 +5,17 @@ BINARY    = hbactl
 MAIN      = .
 LDFLAGS   = -s -w -X github.com/hrodrig/hbactl/cmd.Version=$(VERSION)
 
-.PHONY: build test clean install release snapshot docker-build lint lint-fix
+.PHONY: build test clean install release snapshot docker-build docker-scan lint lint-fix check
 
 build:
 	go build -ldflags "$(LDFLAGS)" -o $(BINARY) $(MAIN)
 
 test:
 	go test ./...
+
+# Full pre-merge/release check: verify deps, build, test, lint, security scan (govulncheck + optional Grype on dir)
+check:
+	go mod verify && go build ./... && go test ./... && $(MAKE) lint && ./tools/scan.sh
 
 # Lint: gofmt + gocyclo (run during development; CI runs this too)
 lint:
@@ -48,3 +52,9 @@ snapshot:
 # Docker image (VERSION from file; override: make docker-build VERSION=v0.1.10)
 docker-build:
 	docker build --build-arg VERSION=$(VERSION) -t hbactl .
+
+# Build image as hbactl:scan and run Grype (--fail-on high: fails on high and critical). Requires: docker, grype on PATH.
+docker-scan:
+	@command -v grype >/dev/null 2>&1 || { echo "grype not found; install with: brew install grype or https://github.com/anchore/grype#installation"; exit 1; }
+	docker build --build-arg VERSION=$(VERSION) -t hbactl:scan .
+	grype hbactl:scan --fail-on high

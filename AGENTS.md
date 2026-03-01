@@ -24,7 +24,7 @@ Ref: [agents.md](https://agents.md/)
 
 ## Testing
 
-- Run tests: `make test` or `go test ./...`.
+- Run tests: `make test` or `go test ./...`. Full pre-merge check (deps, build, test, lint, scan): **`make check`**.
 - Unit tests do **not** require a running PostgreSQL server (parser, file, output tests are self-contained).
 - Fix any failing test before finishing; add or update tests for changed behavior.
 
@@ -41,8 +41,7 @@ Ref: [agents.md](https://agents.md/)
 ## Release and versioning
 
 - Releases and tags are made **only from `main`**. Work on `develop` or feature branches, then merge to `main`.
-- **All tests must pass before release:** run `make test` (or `go test ./...`) and fix any failure before tagging or running `make release`.
-- **Security scan before release:** run `./tools/scan.sh` (or ensure the **Security** workflow has passed). See [tools/README.md](tools/README.md).
+- **Before merge/release:** run **`make check`** (go mod verify, build, test, lint, scan.sh). Optionally **`make docker-scan`** for Grype on the built image. See [tools/README.md](tools/README.md).
 - Before release: bump the **VERSION** file (e.g. to `0.1.10`) and the version badge in `README.md` to match (e.g. `version-v0.1.10`).
 - Release: `git tag v0.1.10 && make release` (requires goreleaser). Homebrew cask push requires `HOMEBREW_TAP_TOKEN` (PAT with `repo` scope) in the environment.
 
