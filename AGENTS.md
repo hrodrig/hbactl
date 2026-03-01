@@ -9,7 +9,7 @@ Ref: [agents.md](https://agents.md/)
 ## Project overview
 
 - **Language:** Go; single binary, no CGO.
-- **Layout:** `cmd/` (Cobra subcommands: list, add, remove, check, reload), `internal/hba` (parser, file, rules, sort), `internal/cli` (output), `internal/pg` (Postgres client).
+- **Layout:** `cmd/` (Cobra subcommands: list, add, remove, check, reload), `internal/hba` (parser, file, rules, sort), `internal/cli` (output), `internal/pg` (Postgres client). **tools/** — scripts and docs for security scanning before merge/release (see [tools/README.md](tools/README.md)).
 - **Releases:** GoReleaser from `main` only. **VERSION** file (root) is the single source of truth; Makefile reads it, README badge must match (see `.cursor/rules/readme-badges-version.mdc`).
 
 ---
@@ -42,6 +42,7 @@ Ref: [agents.md](https://agents.md/)
 
 - Releases and tags are made **only from `main`**. Work on `develop` or feature branches, then merge to `main`.
 - **All tests must pass before release:** run `make test` (or `go test ./...`) and fix any failure before tagging or running `make release`.
+- **Security scan before release:** run `./tools/scan.sh` (or ensure the **Security** workflow has passed). See [tools/README.md](tools/README.md).
 - Before release: bump the **VERSION** file (e.g. to `0.1.10`) and the version badge in `README.md` to match (e.g. `version-v0.1.10`).
 - Release: `git tag v0.1.10 && make release` (requires goreleaser). Homebrew cask push requires `HOMEBREW_TAP_TOKEN` (PAT with `repo` scope) in the environment.
 
@@ -49,8 +50,9 @@ Ref: [agents.md](https://agents.md/)
 
 ## Docs and assets
 
-- User-facing docs: `README.md`. Sequence diagrams: `docs/README.md` and `docs/sequence-*.md`.
+- User-facing docs: `README.md`. Sequence diagrams: `docs/README.md` and `docs/sequence-*.md`. Community: `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `CHANGELOG.md` (Keep a Changelog; update on release and when adding notable changes).
 - Demo GIF: `docs/demo.gif` from `vhs docs/demo.tape` (run from repo root after `go build -o hbactl .`).
+- **Docker:** `make docker-build` or `docker build -t hbactl .`; see README Docker section for run examples.
 
 ---
 

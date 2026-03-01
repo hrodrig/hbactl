@@ -13,10 +13,10 @@ var localTypes = map[string]bool{
 
 // hostTypes are connection types that have an address field (5+ fields: type, database, user, address, method [, options]).
 var hostTypes = map[string]bool{
-	"host":        true,
-	"hostssl":     true,
-	"hostnossl":   true,
-	"hostgssenc":  true,
+	"host":         true,
+	"hostssl":      true,
+	"hostnossl":    true,
+	"hostgssenc":   true,
 	"hostnogssenc": true,
 }
 

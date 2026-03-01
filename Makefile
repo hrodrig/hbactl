@@ -5,13 +5,25 @@ BINARY    = hbactl
 MAIN      = .
 LDFLAGS   = -s -w -X github.com/hrodrig/hbactl/cmd.Version=$(VERSION)
 
-.PHONY: build test clean install release
+.PHONY: build test clean install release snapshot docker-build lint lint-fix
 
 build:
 	go build -ldflags "$(LDFLAGS)" -o $(BINARY) $(MAIN)
 
 test:
 	go test ./...
+
+# Lint: gofmt + gocyclo (run during development; CI runs this too)
+lint:
+	@echo "Checking gofmt -s..."
+	@unformatted=$$(gofmt -s -l .); [ -z "$$unformatted" ] || { echo "Files not formatted (run make lint-fix):"; echo "$$unformatted"; exit 1; }
+	@echo "Checking gocyclo (complexity <= 14)..."
+	@command -v gocyclo >/dev/null 2>&1 || go install github.com/fzipp/gocyclo/cmd/gocyclo@latest
+	@gocyclo -over 14 .
+
+# Fix formatting only (gofmt -s -w); re-run make lint to verify gocyclo
+lint-fix:
+	gofmt -s -w .
 
 clean:
 	rm -f $(BINARY)
@@ -32,3 +44,7 @@ release:
 # Snapshot build (no tag required), outputs to dist/
 snapshot:
 	goreleaser release --snapshot --clean
+
+# Docker image (VERSION from file; override: make docker-build VERSION=v0.1.10)
+docker-build:
+	docker build --build-arg VERSION=$(VERSION) -t hbactl .
