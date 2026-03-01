@@ -1,0 +1,14 @@
+---
+description: All tests must pass before release
+alwaysApply: true
+---
+
+# Release: tests must pass
+
+Before merging to `main` or creating a release (tag and `make release`):
+
+- Run **`make check`** (go mod verify, build, test, lint, scan.sh). If lint fails on **formatting**: run **`make lint-fix`** then `make check` again. If it fails on **complexity** (gocyclo): refactor so complexity stays ≤ 14. Optionally run **`make docker-scan`** for Grype on the built image. Alternatively run the steps individually: `make lint`, `make test`, `./tools/scan.sh`; ensure the **Security** workflow has passed on the branch you are releasing from.
+- Fix any failing step before tagging or running `make release`.
+- Do not push a release tag if the test suite or security scan is red.
+
+Releases are made only from the `main` branch.

@@ -18,9 +18,9 @@ var (
 	addAddr      string
 	addNetmask   string
 	addMethod    string
-	addIdentMap   string
-	addDryRun     bool
-	addAfterUser  string
+	addIdentMap  string
+	addDryRun    bool
+	addAfterUser string
 )
 
 var addCmd = &cobra.Command{
@@ -45,7 +45,7 @@ func init() {
 	_ = addCmd.MarkFlagRequired("method")
 }
 
-func runAdd(cmd *cobra.Command, _ []string) error {
+func normalizeAddFlags() (hba.Rule, error) {
 	typ := strings.ToLower(strings.TrimSpace(addType))
 	method := strings.TrimSpace(addMethod)
 	identMap := strings.TrimSpace(addIdentMap)
@@ -64,53 +64,55 @@ func runAdd(cmd *cobra.Command, _ []string) error {
 	netmask := strings.TrimSpace(addNetmask)
 
 	if !hba.LocalType(typ) && !hba.HostType(typ) {
-		return fmt.Errorf("invalid type %q; use one of: local, host, hostssl, hostnossl, hostgssenc, hostnogssenc", typ)
+		return hba.Rule{}, fmt.Errorf("invalid type %q; use one of: local, host, hostssl, hostnossl, hostgssenc, hostnogssenc", typ)
 	}
 	if hba.LocalType(typ) {
 		addr = "-"
 		netmask = ""
-	} else {
-		if addr == "" {
-			return fmt.Errorf("addr is required for type %s (e.g. 127.0.0.1/32, samehost)", typ)
-		}
+	} else if addr == "" {
+		return hba.Rule{}, fmt.Errorf("addr is required for type %s (e.g. 127.0.0.1/32, samehost)", typ)
 	}
+	return hba.Rule{Type: typ, Database: db, User: user, Address: addr, Netmask: netmask, Method: method}, nil
+}
 
+func resolveAddPath(requirePath bool) (string, error) {
 	path := filePath()
-	if path == "" && !addDryRun {
-		conn := connString()
-		if conn == "" {
-			return fmt.Errorf("no connection: set DATABASE_URL or use --conn (or pass path with --file)")
-		}
-		ctx := context.Background()
-		client, err := pg.NewClient(ctx, conn)
-		if err != nil {
-			return fmt.Errorf("could not connect to PostgreSQL: %w", err)
-		}
-		defer client.Close()
-		var p string
-		p, err = client.HBAFilePath(ctx)
-		if err != nil {
-			return fmt.Errorf("could not locate pg_hba.conf. Is PostgreSQL running? %w", err)
-		}
-		path = p
+	if path != "" {
+		return path, nil
 	}
-	if addDryRun {
-		if path == "" {
-			path = "(path from --file or connection)"
-		}
-		rule := hba.Rule{Type: typ, Database: db, User: user, Address: addr, Netmask: netmask, Method: method}
-		line := rule.Line()
-		if line == "" {
-			return fmt.Errorf("invalid rule type %q", typ)
-		}
-		if addAfterUser != "" {
-			fmt.Fprintf(os.Stdout, "dry-run: would insert after last rule for user %q in %s:\n%s\n", strings.TrimSpace(addAfterUser), path, line)
-		} else {
-			fmt.Fprintf(os.Stdout, "dry-run: would append to %s:\n%s\n", path, line)
-		}
-		return nil
+	if !requirePath {
+		return "(path from --file or connection)", nil
 	}
+	conn := connString()
+	if conn == "" {
+		return "", fmt.Errorf("no connection: set DATABASE_URL or use --conn (or pass path with --file)")
+	}
+	ctx := context.Background()
+	client, err := pg.NewClient(ctx, conn)
+	if err != nil {
+		return "", fmt.Errorf("could not connect to PostgreSQL: %w", err)
+	}
+	defer client.Close()
+	p, err := client.HBAFilePath(ctx)
+	if err != nil {
+		return "", fmt.Errorf("could not locate pg_hba.conf. Is PostgreSQL running? %w", err)
+	}
+	return p, nil
+}
 
+func printAddDryRun(rule hba.Rule, path, afterUser string) error {
+	if rule.Line() == "" {
+		return fmt.Errorf("invalid rule type %q", rule.Type)
+	}
+	if afterUser != "" {
+		fmt.Fprintf(os.Stdout, "dry-run: would insert after last rule for user %q in %s:\n%s\n", afterUser, path, rule.Line())
+	} else {
+		fmt.Fprintf(os.Stdout, "dry-run: would append to %s:\n%s\n", path, rule.Line())
+	}
+	return nil
+}
+
+func doAdd(path string, rule hba.Rule, afterUser string) error {
 	backupPath, err := hba.Backup(path)
 	if err != nil {
 		if os.IsPermission(err) {
@@ -119,23 +121,39 @@ func runAdd(cmd *cobra.Command, _ []string) error {
 		return fmt.Errorf("backup failed: %w", err)
 	}
 	fmt.Fprintf(os.Stderr, "Backup created at: %s\n", backupPath)
-
-	rule := hba.Rule{Type: typ, Database: db, User: user, Address: addr, Netmask: netmask, Method: method}
-	if addAfterUser != "" {
-		afterUser := strings.TrimSpace(addAfterUser)
+	if afterUser != "" {
 		if err := hba.InsertRuleAfterUser(path, rule, afterUser); err != nil {
 			if os.IsPermission(err) {
 				return fmt.Errorf("insufficient permissions to write to pg_hba.conf. Try running with sudo")
 			}
 			return fmt.Errorf("failed to insert rule after user %q: %w", afterUser, err)
 		}
-	} else if err := hba.AppendRule(path, rule); err != nil {
+		return nil
+	}
+	if err := hba.AppendRule(path, rule); err != nil {
 		if os.IsPermission(err) {
 			return fmt.Errorf("insufficient permissions to write to pg_hba.conf. Try running with sudo")
 		}
 		return fmt.Errorf("failed to append rule: %w", err)
 	}
+	return nil
+}
 
+func runAdd(cmd *cobra.Command, _ []string) error {
+	rule, err := normalizeAddFlags()
+	if err != nil {
+		return err
+	}
+	path, err := resolveAddPath(!addDryRun)
+	if err != nil {
+		return err
+	}
+	if addDryRun {
+		return printAddDryRun(rule, path, strings.TrimSpace(addAfterUser))
+	}
+	if err := doAdd(path, rule, strings.TrimSpace(addAfterUser)); err != nil {
+		return err
+	}
 	fmt.Fprintf(os.Stdout, "Success: New rule added to %s. Run 'hbactl reload' to apply changes.\n", path)
 	return nil
 }

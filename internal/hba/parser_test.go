@@ -19,31 +19,44 @@ host    mydb            app             192.168.1.0/24           md5
 	if err := os.WriteFile(path, []byte(content), 0600); err != nil {
 		t.Fatal(err)
 	}
-
 	rules, err := ParseFile(path)
 	if err != nil {
 		t.Fatalf("ParseFile: %v", err)
 	}
-
 	if want := 4; len(rules) != want {
 		t.Fatalf("got %d rules, want %d", len(rules), want)
 	}
+	checkRule0(t, rules[0])
+	checkRule1(t, rules[1])
+	checkRule2(t, rules[2])
+	checkRule3(t, rules[3])
+}
 
-	// local all all trust
-	if rules[0].Type != "local" || rules[0].Database != "all" || rules[0].User != "all" || rules[0].Address != "-" || rules[0].Method != "trust" {
-		t.Errorf("rule 0: got %+v", rules[0])
+func checkRule0(t *testing.T, r Rule) {
+	t.Helper()
+	if r.Type != "local" || r.Database != "all" || r.User != "all" || r.Address != "-" || r.Method != "trust" {
+		t.Errorf("rule 0: got %+v", r)
 	}
-	// host all all 127.0.0.1/32 scram-sha-256
-	if rules[1].Type != "host" || rules[1].Address != "127.0.0.1/32" || rules[1].Method != "scram-sha-256" {
-		t.Errorf("rule 1: got %+v", rules[1])
+}
+
+func checkRule1(t *testing.T, r Rule) {
+	t.Helper()
+	if r.Type != "host" || r.Address != "127.0.0.1/32" || r.Method != "scram-sha-256" {
+		t.Errorf("rule 1: got %+v", r)
 	}
-	// host all all ::1/128
-	if rules[2].Address != "::1/128" {
-		t.Errorf("rule 2 address: got %q", rules[2].Address)
+}
+
+func checkRule2(t *testing.T, r Rule) {
+	t.Helper()
+	if r.Address != "::1/128" {
+		t.Errorf("rule 2 address: got %q", r.Address)
 	}
-	// host mydb app 192.168.1.0/24 md5
-	if rules[3].Database != "mydb" || rules[3].User != "app" || rules[3].Method != "md5" {
-		t.Errorf("rule 3: got %+v", rules[3])
+}
+
+func checkRule3(t *testing.T, r Rule) {
+	t.Helper()
+	if r.Database != "mydb" || r.User != "app" || r.Method != "md5" {
+		t.Errorf("rule 3: got %+v", r)
 	}
 }
 

@@ -5,8 +5,14 @@
 !.gitignore
 !.goreleaser.yaml
 !Makefile
+!VERSION
 !README.md
 !LICENSE
+!SECURITY.md
+!AGENTS.md
+!CONTRIBUTING.md
+!CODE_OF_CONDUCT.md
+!CHANGELOG.md
 !go.mod
 !go.sum
 !*.go
@@ -15,6 +21,11 @@
 !cmd/
 !internal/
 !internal/**/
+!.github/
+!.github/**
+!tools/
+!tools/**
+!.agents/
 !.cursor/
 !.cursor/rules/
 !.cursor/rules/*.mdc
@@ -23,3 +34,9 @@
 !docs/*.gif
 !docs/*.tape
 !sample-pg_hba.conf
+!Dockerfile
+!Dockerfile.release
+!.dockerignore
+# Never track macOS metadata
+.DS_Store
+**/.DS_Store

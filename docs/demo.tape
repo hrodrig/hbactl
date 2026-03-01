@@ -10,11 +10,6 @@ Set Height 520
 Set Padding 20
 Set TypingSpeed 10ms
 
-# Clean prompt for recording
-Type "export PS1='$ '"
-Enter
-Sleep 300ms
-
 # Version
 Type "./hbactl --version"
 Enter

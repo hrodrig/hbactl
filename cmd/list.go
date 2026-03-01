@@ -13,11 +13,12 @@ import (
 
 var listSort string
 var listGroupBy string
+var listNoIndex bool
 
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List pg_hba.conf rules in a table",
-	Long:  "Connects to PostgreSQL, discovers pg_hba.conf, parses it, and prints rules in a formatted table. Use --sort to order by column (display only; file order is unchanged). Use --group-by user to print separators between users.",
+	Long:  "Connects to PostgreSQL, discovers pg_hba.conf, parses it, and prints rules in a formatted table. Use --sort to order by column (display only; file order is unchanged). Use --group-by user to print separators between users. Use --no-index to omit the rule index column for copy-paste friendly output.",
 	RunE:  runList,
 }
 
@@ -25,6 +26,7 @@ func init() {
 	rootCmd.AddCommand(listCmd)
 	listCmd.Flags().StringVar(&listSort, "sort", "", "Sort by column: type, database, user, address, method")
 	listCmd.Flags().StringVar(&listGroupBy, "group-by", "", "Print visual separators by column (e.g. user); implies --sort by that column if not set")
+	listCmd.Flags().BoolVar(&listNoIndex, "no-index", false, "Omit the # column so output is copy-paste friendly (no rule numbers)")
 }
 
 func runList(cmd *cobra.Command, _ []string) error {
@@ -69,10 +71,18 @@ func runList(cmd *cobra.Command, _ []string) error {
 	}
 
 	fmt.Printf("File: %s (%d rule(s))\n\n", path, len(rwl))
-	if listGroupBy == "user" {
-		cli.WriteRulesTableGroupedByUser(os.Stdout, rwl)
+	if listNoIndex {
+		if listGroupBy == "user" {
+			cli.WriteRulesTableGroupedByUserNoIndex(os.Stdout, rwl)
+		} else {
+			cli.WriteRulesTableNoIndex(os.Stdout, rwl)
+		}
 	} else {
-		cli.WriteRulesTableWithIndex(os.Stdout, rwl)
+		if listGroupBy == "user" {
+			cli.WriteRulesTableGroupedByUser(os.Stdout, rwl)
+		} else {
+			cli.WriteRulesTableWithIndex(os.Stdout, rwl)
+		}
 	}
 	return nil
 }

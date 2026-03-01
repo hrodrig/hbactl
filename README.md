@@ -1,12 +1,21 @@
 # hbactl
 
-[![version](https://img.shields.io/badge/version-v0.1.9-blue)](https://github.com/hrodrig/hbactl/releases) [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Version](https://img.shields.io/badge/version-0.2.2-blue)](https://github.com/hrodrig/hbactl/releases)
+[![Release](https://img.shields.io/github/v/release/hrodrig/hbactl)](https://github.com/hrodrig/hbactl/releases)
+[![Go 1.26](https://img.shields.io/badge/go-1.26-00ADD8?logo=go)](https://go.dev/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![pkg.go.dev](https://pkg.go.dev/badge/github.com/hrodrig/hbactl)](https://pkg.go.dev/github.com/hrodrig/hbactl)
+[![Go Report Card](https://goreportcard.com/badge/github.com/hrodrig/hbactl)](https://goreportcard.com/report/github.com/hrodrig/hbactl)
 
-`hbactl` is a lightweight CLI tool written in **Go** designed to manage your PostgreSQL Host-Based Authentication (`pg_hba.conf`) file safely and efficiently.
+**Repo:** [github.com/hrodrig/hbactl](https://github.com/hrodrig/hbactl) · **Releases:** [Releases](https://github.com/hrodrig/hbactl/releases)
+
+Lightweight **Go** CLI to manage PostgreSQL Host-Based Authentication (`pg_hba.conf`) safely: list, add, remove rules; check syntax; reload config. Auto-discovers the file via the running Postgres instance or use `--file`.
+
+**Documentation:** [Sequence diagrams](docs/README.md) (Mermaid) for command flows (general, list, add, remove, check, reload), and terminal demo (recorded with [VHS](https://github.com/charmbracelet/vhs)) — see [docs/](docs/README.md). **Scanning** before release (govulncheck, Grype): [tools/README.md](tools/README.md).
 
 ![hbactl demo](docs/demo.gif)
 
-See the [sequence diagrams](docs/README.md) for command flows (general, list, add, remove, check, reload).
+---
 
 ## Features
 
@@ -43,6 +52,19 @@ cd hbactl
 go build -o hbactl .
 ```
 
+**Docker:**
+
+Published image (multi-arch from release): `ghcr.io/hrodrig/hbactl:latest` or `ghcr.io/hrodrig/hbactl:v0.2.0`. To build from source (same as CI): `make docker-build` or `docker build -t hbactl .`
+
+Mount your `pg_hba.conf` (or the directory that contains it) and pass a connection string so `hbactl` can discover the file or run `reload`:
+
+```bash
+docker run --rm -e DATABASE_URL="postgres://user:pass@host:5432/db?sslmode=disable" -v /path/to/pg_hba.conf:/pg_hba.conf ghcr.io/hrodrig/hbactl:latest list -f /pg_hba.conf
+docker run --rm -e DATABASE_URL="postgres://..." -v /path/to/pgdata:/pgdata ghcr.io/hrodrig/hbactl:latest list   # auto-discovery from Postgres
+```
+
+Use `-f /path/to/pg_hba.conf` when the file is mounted at a known path; omit it when using auto-discovery and the container can reach the Postgres server.
+
 ## Usage
 
 Global flags (optional):
@@ -52,11 +74,12 @@ Global flags (optional):
 
 ### List current rules
 
-Displays a formatted table of your rules with a **#** column (1-based index in file order; use with `remove --index`). Supports **`--sort`** by column: `type`, `database`, `user`, `address`, `method` (display only; file order is unchanged). Use **`--group-by user`** to print `=== user: name ===` separators between users (implies sort by user if `--sort` is not set).
+Displays a formatted table of your rules with a **#** column (1-based index in file order; use with `remove --index`). Use **`--no-index`** to omit the # column for copy-paste friendly output. Supports **`--sort`** by column: `type`, `database`, `user`, `address`, `method` (display only; file order is unchanged). Use **`--group-by user`** to print `=== user: name ===` separators between users (implies sort by user if `--sort` is not set).
 
 ```bash
 hbactl list
 hbactl list -f /path/to/pg_hba.conf              # no connection needed
+hbactl list --no-index --sort database           # copy-paste friendly, no rule numbers
 hbactl list --sort user
 hbactl list --group-by user                      # separators between users
 ```
@@ -202,4 +225,4 @@ git push origin v0.1.0
 
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE). Contributing: [CONTRIBUTING.md](CONTRIBUTING.md). Code of Conduct: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md). Changelog: [CHANGELOG.md](CHANGELOG.md).

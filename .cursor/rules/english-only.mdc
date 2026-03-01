@@ -11,4 +11,4 @@ All **code** in this repository must be in **English**:
 - **Comments**: line and block comments in source files
 - **Strings in code**: error messages, log text, CLI output, user-facing strings
 
-Documentation (README, PLAN) and commit messages are recommended in English for a public repo but not enforced by this rule. Local notes (e.g. NOTES.txt) may stay in any language.
+Documentation (README) and commit messages are recommended in English for a public repo but not enforced by this rule. Local notes (e.g. NOTES.txt) may stay in any language.
