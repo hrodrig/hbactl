@@ -1,4 +1,7 @@
-# Runtime image for GoReleaser dockers_v2. Binary is injected by GoReleaser per platform.
+# Runtime image for GoReleaser dockers_v2. Binary is under linux/<arch>/hbactl per platform.
+# We COPY the whole linux/ tree then pick the right binary so we work with both
+# single-platform (snapshot) and multi-platform (release) contexts.
+ARG TARGETPLATFORM
 FROM alpine:3.23
 LABEL org.opencontainers.image.title="hbactl"
 LABEL org.opencontainers.image.description="CLI to manage PostgreSQL pg_hba.conf (list, add, remove, check, reload)"
@@ -6,8 +9,13 @@ LABEL org.opencontainers.image.source="https://github.com/hrodrig/hbactl"
 LABEL org.opencontainers.image.authors="Hermes Rodríguez <https://github.com/hrodrig/hbactl>"
 RUN apk --no-cache add ca-certificates
 RUN adduser -D -g "" hbactl
-COPY hbactl /home/hbactl/hbactl
-RUN chown hbactl:hbactl /home/hbactl/hbactl
+COPY linux/ /tmp/linux/
+ARG TARGETPLATFORM
+RUN case "$TARGETPLATFORM" in \
+	linux/amd64) cp /tmp/linux/amd64/hbactl /home/hbactl/hbactl ;; \
+	linux/arm64) cp /tmp/linux/arm64/hbactl /home/hbactl/hbactl ;; \
+	*) cp /tmp/linux/amd64/hbactl /home/hbactl/hbactl ;; \
+	esac && chown hbactl:hbactl /home/hbactl/hbactl
 USER hbactl
 WORKDIR /home/hbactl
 ENTRYPOINT ["/home/hbactl/hbactl"]
