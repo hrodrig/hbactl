@@ -54,12 +54,13 @@ go build -o hbactl .
 
 **Docker:**
 
-Build and run the CLI in a container. Mount your `pg_hba.conf` (or the directory that contains it) and pass a connection string so `hbactl` can discover the file or run `reload`:
+Published image (multi-arch from release): `ghcr.io/hrodrig/hbactl:latest` or `ghcr.io/hrodrig/hbactl:v0.2.0`. To build from source (same as CI): `make docker-build` or `docker build -t hbactl .`
+
+Mount your `pg_hba.conf` (or the directory that contains it) and pass a connection string so `hbactl` can discover the file or run `reload`:
 
 ```bash
-docker build -t hbactl .
-docker run --rm -e DATABASE_URL="postgres://user:pass@host:5432/db?sslmode=disable" -v /path/to/pg_hba.conf:/pg_hba.conf hbactl list -f /pg_hba.conf
-docker run --rm -e DATABASE_URL="postgres://..." -v /path/to/pgdata:/pgdata hbactl list   # auto-discovery from Postgres
+docker run --rm -e DATABASE_URL="postgres://user:pass@host:5432/db?sslmode=disable" -v /path/to/pg_hba.conf:/pg_hba.conf ghcr.io/hrodrig/hbactl:latest list -f /pg_hba.conf
+docker run --rm -e DATABASE_URL="postgres://..." -v /path/to/pgdata:/pgdata ghcr.io/hrodrig/hbactl:latest list   # auto-discovery from Postgres
 ```
 
 Use `-f /path/to/pg_hba.conf` when the file is mounted at a known path; omit it when using auto-discovery and the container can reach the Postgres server.

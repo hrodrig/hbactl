@@ -55,6 +55,22 @@ changelog:
       - "^chore:"
       - "^test:"
 
+# Docker: multi-arch image to ghcr.io (same GITHUB_TOKEN)
+dockers_v2:
+  - dockerfile: Dockerfile.release
+    ids:
+      - hbactl
+    images:
+      - ghcr.io/hrodrig/hbactl
+    tags:
+      - "v{{ .Version }}"
+      - "{{ if not .IsSnapshot }}latest{{ end }}"
+    labels:
+      org.opencontainers.image.title: "hbactl"
+      org.opencontainers.image.description: "CLI to manage PostgreSQL pg_hba.conf (list, add, remove, check, reload)"
+      org.opencontainers.image.source: "https://github.com/hrodrig/hbactl"
+      org.opencontainers.image.version: "{{ .Version }}"
+
 # Homebrew: publish cask to tap so users can "brew install hrodrig/hbactl/hbactl"
 # Create repo https://github.com/hrodrig/homebrew-hbactl first. For CI, set HOMEBREW_TAP_TOKEN (PAT with repo scope).
 homebrew_casks:

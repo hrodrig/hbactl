@@ -35,6 +35,7 @@
 !docs/*.tape
 !sample-pg_hba.conf
 !Dockerfile
+!Dockerfile.release
 !.dockerignore
 # Never track macOS metadata
 .DS_Store

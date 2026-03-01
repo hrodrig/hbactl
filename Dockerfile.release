@@ -1,0 +1,13 @@
+# Runtime image for GoReleaser dockers_v2. Binary is injected by GoReleaser per platform.
+FROM alpine:3.23
+LABEL org.opencontainers.image.title="hbactl"
+LABEL org.opencontainers.image.description="CLI to manage PostgreSQL pg_hba.conf (list, add, remove, check, reload)"
+LABEL org.opencontainers.image.source="https://github.com/hrodrig/hbactl"
+LABEL org.opencontainers.image.authors="Hermes Rodríguez <https://github.com/hrodrig/hbactl>"
+RUN apk --no-cache add ca-certificates
+RUN adduser -D -g "" hbactl
+COPY hbactl /home/hbactl/hbactl
+RUN chown hbactl:hbactl /home/hbactl/hbactl
+USER hbactl
+WORKDIR /home/hbactl
+ENTRYPOINT ["/home/hbactl/hbactl"]
